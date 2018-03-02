@@ -9,11 +9,11 @@ from ckan.lib.uploader import ResourceUpload as DefaultResourceUpload
 from ckan.lib.helpers import flash_error
 
 
-def get_file_hash(f):
+def get_file_hash(file_name):
     hash_md5 = hashlib.md5()
-    # with fname as f:
-    for chunk in iter(lambda: f.read(65536), b""):
-        hash_md5.update(chunk)
+    with open(file_name, 'rb') as f:
+        for chunk in iter(lambda: f.read(65536), b""):
+            hash_md5.update(chunk)
     return hash_md5.hexdigest()
 
 
@@ -35,31 +35,13 @@ class HashvalidationPlugin(p.SingletonPlugin, tk.DefaultDatasetForm):
     p.implements(p.IUploader, inherit=True)
 
     def get_resource_uploader(self, data_dict):
-        print 'UPLOAD >>>>>> {}'.format(data_dict)
-        try:
-            return ResourceUpload(data_dict)
-        except ValueError:
-            print 'ERROR <<<<<<<<<<<<<<<<<<<< '
-            flash_error('File hash invalid')
-        return None
-
-    # def get_uploader(self, data_dict):
-    #     print 'UPLOAD2 >>>>>> {}'.format(data_dict)
-    #     return ResourceUpload(data_dict)
-
-    def get_path(self, id):
-        directory = self.get_directory(id)
-        # filepath = os.path.join(
-        #     directory, '{}_{}'.format(self.path_prefix, id[6:]))
-        print 'PATH >>>>>>>>>>>>> {}'.format(directory)
-        return directory
+        return ResourceUpload(data_dict)
 
     def _modify_package_schema(self, schema):
         schema['resources'].update({'file_hash_sum': [hash_validator]})
         return schema
 
     def update_package_schema(self):
-        print 'UPDATE >>>>>>>>>> '
         schema = super(HashvalidationPlugin, self).update_package_schema()
         schema = self._modify_package_schema(schema)
         return schema
@@ -85,9 +67,14 @@ class ResourceUpload(DefaultResourceUpload):
 
     def __init__(self, resource):
         super(ResourceUpload, self).__init__(resource)
-        print 'MD >>>>>>>>>> {}'.format(get_file_hash(self.upload_file))
-        self.file_hash = get_file_hash(self.upload_file)
-        if self.file_hash != 'xxx':
-            raise ValueError('Hash Invalid!')
-            print 'FILE: {}'.format(self.file_name)
+        self.resource = resource
+
+    def upload(self, id, max_size=10):
+        super(ResourceUpload, self).upload(id)
+        file_hash = get_file_hash(self.get_path(id))
+        if file_hash != self.resource.get('file_hash_sum'):
+            os.remove(self.get_path(id))
+            flash_error('File hash invalid')
+            tk.redirect_to(controller='dataset_resources', id=self.resource.get('package_id'))
+            return None
 
