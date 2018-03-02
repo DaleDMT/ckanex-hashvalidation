@@ -1,0 +1,12 @@
+{% ckan_extends %}
+
+{% block package_description %}
+  {{ super() }}
+
+  {# Add our custom country_code field to the dataset read page. #}
+<tr>
+<th scope="row">File Hash Sum</th>
+<td>{{ h.format_resource_items(file_hash_sum) or 'None' }}</td>
+</tr>
+
+{% endblock %}

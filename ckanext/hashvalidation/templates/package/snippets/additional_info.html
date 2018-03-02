@@ -1,0 +1,10 @@
+{% ckan_extends %}
+
+{% block extras %}
+  {% if pkg_dict.custom_text %}
+    <tr>
+      <th scope="row" class="dataset-label">{{ _("File hash sum") }}</th>
+      <td class="dataset-details">{{ pkg_dict.file_hash_sum }}</td>
+    </tr>
+  {% endif %}
+{% endblock %}
