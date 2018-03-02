@@ -2,6 +2,7 @@
 
 import hashlib
 import os
+from collections import defaultdict
 
 import ckan.plugins as p
 import ckan.plugins.toolkit as tk
@@ -17,18 +18,6 @@ def get_file_hash(file_name):
     return hash_md5.hexdigest()
 
 
-def hash_validator(key, data, errors, context):
-    # print 'value >>>>>>>> : {}'.format(value)
-    # print 'flatten_data >>>>>>>> : {}'.format(flatten_data.get(('resources', 0, 'file_hash_sum')))
-    # print 'context >>>>>>>> : {}'.format(flatten_data[key])
-    print "GET >>>>>>> {}".format(data.get(key, ), None)
-    print "GET >>>>>>> {}".format(data.get((key[0], key[1], 'name',)), None)
-    # resource_create = tk.get_action('resource_create')(context, data)
-    # print 'ACTION {}'.format(resource_create)
-    # if data[key] != 'xxx':
-    #     raise tk.Invalid('Hash Invalid!')
-
-
 class HashvalidationPlugin(p.SingletonPlugin, tk.DefaultDatasetForm):
     p.implements(p.IDatasetForm)
     p.implements(p.IConfigurer)
@@ -38,7 +27,7 @@ class HashvalidationPlugin(p.SingletonPlugin, tk.DefaultDatasetForm):
         return ResourceUpload(data_dict)
 
     def _modify_package_schema(self, schema):
-        schema['resources'].update({'file_hash_sum': [hash_validator]})
+        schema['resources'].update({'file_hash_sum': []})
         return schema
 
     def update_package_schema(self):
@@ -73,8 +62,14 @@ class ResourceUpload(DefaultResourceUpload):
         super(ResourceUpload, self).upload(id)
         file_hash = get_file_hash(self.get_path(id))
         if file_hash != self.resource.get('file_hash_sum'):
-            os.remove(self.get_path(id))
+            try:
+                os.remove(self.get_path(id))
+            except IOError:
+                pass
+            except OSError:
+                pass
             flash_error('File hash invalid')
             tk.redirect_to(controller='dataset_resources', id=self.resource.get('package_id'))
             return None
+
 
