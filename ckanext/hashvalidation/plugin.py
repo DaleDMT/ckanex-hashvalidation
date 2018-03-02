@@ -68,6 +68,7 @@ class ResourceUpload(DefaultResourceUpload):
             except OSError:
                 pass
             flash_error('File hash invalid')
+            # TODO: repare redirect url
             tk.redirect_to(controller='dataset_resources', id=self.resource.get('package_id'))
             return None
 
