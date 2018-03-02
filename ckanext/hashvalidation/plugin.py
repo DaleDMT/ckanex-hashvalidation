@@ -2,7 +2,6 @@
 
 import hashlib
 import os
-from collections import defaultdict
 
 import ckan.plugins as p
 import ckan.plugins.toolkit as tk
