@@ -80,7 +80,7 @@ setup(
     # pip to create the appropriate form of executable for the target platform.
     entry_points='''
         [ckan.plugins]
-        hashvalidation=ckanext.hashvalidation.plugin:HashvalidationPlugin
+        hashvalidation=ckanext.hashvalidation.plugin:HashValidationPlugin
 
         [babel.extractors]
         ckan = ckan.lib.extract:extract_ckan

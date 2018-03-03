@@ -3,7 +3,6 @@
 {% block basic_fields_url %}
 {{ super() }}
 
-{{ form.input('file_hash_sum', label=_('File Hash Sum'), id='field-file_hash_sum', placeholder=_('File hash sum (md5)'),
-value=data.file_hash_sum, error=errors.file_hash_sum, classes=['control-medium']) }}
+{{ form.input('file_hash_sum', label=_('File Hash Sum'), id='field-file_hash_sum', placeholder=_('File hash sum (md5)'), value=data.file_hash_sum, error=errors.file_hash_sum, classes=['control-medium']) }}
 
 {% endblock %}
