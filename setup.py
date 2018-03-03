@@ -21,11 +21,11 @@ setup(
     long_description=long_description,
 
     # The project's main homepage.
-    url='https://github.com//ckanext-hashvalidation',
+    url='https://github.com/DaleDMT/ckanext-hashvalidation',
 
     # Author details
-    author='''A''',
-    author_email='''''',
+    author='''908''',
+    author_email='''mail@908.vc''',
 
     # Choose your license
     license='AGPL',
