@@ -58,19 +58,20 @@ class ResourceUpload(DefaultResourceUpload):
         :return:
         """
         super(ResourceUpload, self).upload(id)
-        try:
-            file_hash = get_file_hash(self.get_path(id))
-        except OSError:
-            logger.error('Сan not open file for hash sum checking!')
-            h.flash_error(tk._('Trouble when file has sum checking. Try again.'))
-            tk.redirect_to(controller='package', action='new_resource', id=self.resource.get('package_id'))
-        if file_hash != self.resource.get('file_hash_sum'):
+        if self.resource.get('file_hash_sum'):
             try:
-                os.remove(self.get_path(id))
+                file_hash = get_file_hash(self.get_path(id))
             except OSError:
-                logger.error('Сan not delete file!')
-            h.flash_error(tk._('File hash sum invalid.'))
-            tk.redirect_to(controller='package', action='new_resource', id=self.resource.get('package_id'))
-            return None
+                logger.error('Сan not open file for hash sum checking!')
+                h.flash_error(tk._('Trouble when file has sum checking. Try again.'))
+                tk.redirect_to(controller='package', action='new_resource', id=self.resource.get('package_id'))
+            if file_hash != self.resource.get('file_hash_sum'):
+                try:
+                    os.remove(self.get_path(id))
+                except OSError:
+                    logger.error('Сan not delete file!')
+                h.flash_error(tk._('File hash sum invalid.'))
+                tk.redirect_to(controller='package', action='new_resource', id=self.resource.get('package_id'))
+                return None
 
 
